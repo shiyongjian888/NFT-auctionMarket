@@ -1,0 +1,22 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true  # 启用IR优化，解决栈过深问题并减少合约大小
+# 模糊测试运行次数
+fuzz = { runs = 256 }
+# 属性测试运行次数
+invariant = { runs = 256 }
+# Gas报告
+gas_reports = ["*"]
+
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC}"
+mainnet = "${MAINNET_RPC}"
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
