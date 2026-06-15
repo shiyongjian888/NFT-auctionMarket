@@ -285,7 +285,7 @@ contract MyNFTTest is Test {
         nft.setBaseURI("ipfs://base/");
     }
 
-    function testSupportsInterface() public {
+    function testSupportsInterface() public view {
         bool ok = nft.supportsInterface(type(IERC721).interfaceId);
         assertTrue(ok);
     }
