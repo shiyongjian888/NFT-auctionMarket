@@ -131,12 +131,23 @@ function run() external {
         // 3. Upgrade proxy
         // =====================================================
 
-        AuctionMarket(payable(proxyAddress)).upgradeToAndCall(address(newImplementation), "");
+        AuctionMarket(payable(proxyAddress)).upgradeToAndCall(
+            address(newImplementation),
+            abi.encodeCall(AuctionMarketV2.initializeV2, (2))
+        );
 
         vm.stopBroadcast();
 
         console.log("Upgrade completed for proxy:", proxyAddress);
     }
+```
+
+### 升级部署脚本
+
+```bash
+# 升级部署到 Sepolia，环境变量添加PROXY_ADDRESS=0xxxxxxx
+forge script script/UpgradeAuctionMarket.s.sol:UpgradeAuctionMarket --rpc-url $SEPOLIA_RPC_URL --broadcast --verify
+
 ```
 
 ## 关键设计决策
