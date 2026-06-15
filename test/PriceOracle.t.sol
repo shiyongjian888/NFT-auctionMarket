@@ -9,6 +9,20 @@ import "../src/mocks/MockV3Aggregator.sol";
 import "../src/mocks/MockERC20.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
+contract StaleMockV3Aggregator {
+    uint8 public immutable decimals;
+    int256 private immutable answer;
+
+    constructor(uint8 decimals_, int256 answer_) {
+        decimals = decimals_;
+        answer = answer_;
+    }
+
+    function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
+        return (1, answer, 0, 0, 1);
+    }
+}
+
 contract PriceOracleTest is Test {
     PriceOracle oracle;
 
@@ -69,6 +83,29 @@ contract PriceOracleTest is Test {
         uint256 usd = oracle.getUsdValue(address(usdc), 1000e6);
 
         assertGt(usd, 0);
+    }
+
+    function testSetTokenFeedRevertsForZeroFeed() public {
+        vm.prank(owner);
+        vm.expectRevert(PriceOracle.InvalidFeed.selector);
+        oracle.setTokenFeed(address(usdc), address(0));
+    }
+
+    function testGetLatestPriceRevertsForStalePrice() public {
+        StaleMockV3Aggregator staleFeed = new StaleMockV3Aggregator(8, 3000e8);
+
+        vm.prank(owner);
+        oracle.setTokenFeed(address(0), address(staleFeed));
+
+        vm.expectRevert("stale price");
+        oracle.getLatestPrice(address(0));
+    }
+
+    function testGetLatestPriceRevertsForInvalidPrice() public {
+        ethFeed.updateAnswer(0);
+
+        vm.expectRevert(PriceOracle.InvalidPrice.selector);
+        oracle.getLatestPrice(address(0));
     }
 
     function testRemoveTokenDisablesToken() public {

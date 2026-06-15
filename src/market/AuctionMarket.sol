@@ -15,7 +15,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 import "../interfaces/IPriceOracle.sol";
 
 /**
- * @title 拍卖合约 
+ * @title 拍卖合约
  * @notice 支持升级、暂停
  */
 contract AuctionMarket is
@@ -41,34 +41,45 @@ contract AuctionMarket is
     error UnsupportedToken();
     error AlreadyHasBid();
     error InvalidDuration();
+    error AlreadyHighestBidder();
 
     // =====================================================
     // 事件
     // =====================================================
 
     event AuctionCreated(
-        uint256 indexed auctionId, address indexed seller, address indexed nft, uint256 tokenId, uint256 endTime
+        uint256 indexed auctionId,
+        address indexed seller,
+        address indexed nft,
+        uint256 tokenId,
+        uint256 endTime
     );
 
     event AuctionCancelledEvent(uint256 indexed auctionId);
 
     event BidPlaced(
-        uint256 indexed auctionId, address indexed bidder, address bidToken, uint256 amount, uint256 usdValue
+        uint256 indexed auctionId,
+        address indexed bidder,
+        address bidToken,
+        uint256 amount,
+        uint256 usdValue
     );
 
     event AuctionEndedEvent(
-        uint256 indexed auctionId, address winner, address bidToken, uint256 amount, uint256 usdValue
+        uint256 indexed auctionId,
+        address winner,
+        address bidToken,
+        uint256 amount,
+        uint256 usdValue
     );
-
-    event Withdrawal(address indexed user, address token, uint256 amount);
 
     // =====================================================
     // 结构体
     // =====================================================
 
     enum AuctionStatus {
-        Active,   // 开始
-        Ended,    // 结束
+        Active, // 开始
+        Ended, // 结束
         Cancelled // 取消
     }
 
@@ -99,13 +110,7 @@ contract AuctionMarket is
 
     mapping(uint256 => Auction) private auctions;
 
-    mapping(address => uint256[]) private sellerAuctions;
-
-    mapping(address => uint256[]) private bidderAuctions;
-
-    mapping(address => mapping(uint256 => bool)) private bidderJoined;
-
-    mapping(address => mapping(address => uint256)) public pendingWithdrawals;
+    //  mapping(address => mapping(address => uint256)) public pendingWithdrawals;
 
     // =====================================================
     // Initialize 初始化
@@ -116,10 +121,12 @@ contract AuctionMarket is
         _disableInitializers();
     }
 
-    function initialize(address owner_, address oracle_, address feeRecipient_, uint96 platformFee_)
-        external
-        initializer
-    {
+    function initialize(
+        address owner_,
+        address oracle_,
+        address feeRecipient_,
+        uint96 platformFee_
+    ) external initializer {
         __Ownable_init(owner_);
 
         __Pausable_init();
@@ -139,12 +146,19 @@ contract AuctionMarket is
     // 创建拍卖
     // =====================================================
 
-    function createAuction(address nft, uint256 tokenId, uint256 duration) external whenNotPaused nonReentrant {
+    function createAuction(
+        address nft,
+        uint256 tokenId,
+        uint256 duration
+    ) external whenNotPaused nonReentrant {
         if (duration == 0) {
             revert InvalidDuration();
         }
 
-        if (block.timestamp > type(uint64).max || duration > type(uint64).max - block.timestamp) {
+        if (
+            block.timestamp > type(uint64).max ||
+            duration > type(uint64).max - block.timestamp
+        ) {
             revert InvalidDuration();
         }
 
@@ -168,8 +182,6 @@ contract AuctionMarket is
             endTime: uint64(endTime),
             status: AuctionStatus.Active
         });
-
-        sellerAuctions[msg.sender].push(auctionId);
 
         emit AuctionCreated(auctionId, msg.sender, nft, tokenId, endTime);
     }
@@ -212,7 +224,9 @@ contract AuctionMarket is
     // ETH 出价
     // =====================================================
 
-    function bidETH(uint256 auctionId) external payable nonReentrant whenNotPaused {
+    function bidETH(
+        uint256 auctionId
+    ) external payable nonReentrant whenNotPaused {
         Auction storage a = auctions[auctionId];
 
         _validateAuctionBid(a);
@@ -233,8 +247,6 @@ contract AuctionMarket is
 
         a.highestBidUsd = usdValue;
 
-        _recordBidder(auctionId);
-
         emit BidPlaced(auctionId, msg.sender, address(0), msg.value, usdValue);
     }
 
@@ -242,7 +254,11 @@ contract AuctionMarket is
     // ERC20 出价
     // =====================================================
 
-    function bidERC20(uint256 auctionId, address token, uint256 amount) external nonReentrant whenNotPaused {
+    function bidERC20(
+        uint256 auctionId,
+        address token,
+        uint256 amount
+    ) external nonReentrant whenNotPaused {
         if (!oracle.isSupportedToken(token)) {
             revert UnsupportedToken();
         }
@@ -269,8 +285,6 @@ contract AuctionMarket is
 
         a.highestBidUsd = usdValue;
 
-        _recordBidder(auctionId);
-
         emit BidPlaced(auctionId, msg.sender, token, amount, usdValue);
     }
 
@@ -279,6 +293,9 @@ contract AuctionMarket is
     // =====================================================
 
     function _validateAuctionBid(Auction storage a) internal view {
+        if (a.highestBidder == msg.sender) {
+            revert AlreadyHighestBidder();
+        }
         if (a.seller == address(0)) {
             revert AuctionNotFound();
         }
@@ -295,25 +312,16 @@ contract AuctionMarket is
             revert AuctionEnded();
         }
     }
+    // =====================================================
+    // 出价自动退款
+    // =====================================================
 
     function _refundPreviousBid(Auction storage a) internal {
         if (a.highestBidder == address(0)) {
             return;
         }
 
-        pendingWithdrawals[a.highestBidder][a.highestBidToken] += a.highestBidAmount;
-    }
-    
-    // =====================================================
-    // 记录出价人
-    // =====================================================
-
-    function _recordBidder(uint256 auctionId) internal {
-        if (!bidderJoined[msg.sender][auctionId]) {
-            bidderJoined[msg.sender][auctionId] = true;
-
-            bidderAuctions[msg.sender].push(auctionId);
-        }
+        _pay(a.highestBidToken, a.highestBidder, a.highestBidAmount);
     }
 
     // =====================================================
@@ -352,9 +360,19 @@ contract AuctionMarket is
 
         _settleAuction(a);
 
-        IERC721(a.nft).safeTransferFrom(address(this), a.highestBidder, a.tokenId);
+        IERC721(a.nft).safeTransferFrom(
+            address(this),
+            a.highestBidder,
+            a.tokenId
+        );
 
-        emit AuctionEndedEvent(auctionId, a.highestBidder, a.highestBidToken, a.highestBidAmount, a.highestBidUsd);
+        emit AuctionEndedEvent(
+            auctionId,
+            a.highestBidder,
+            a.highestBidToken,
+            a.highestBidAmount,
+            a.highestBidUsd
+        );
     }
 
     // =====================================================
@@ -364,7 +382,11 @@ contract AuctionMarket is
     function _settleAuction(Auction storage a) internal {
         uint256 feeAmount = (a.highestBidAmount * platformFee) / 10000;
 
-        (address royaltyReceiver, uint256 royaltyAmount) = _getRoyaltyInfo(a.nft, a.tokenId, a.highestBidAmount);
+        (address royaltyReceiver, uint256 royaltyAmount) = _getRoyaltyInfo(
+            a.nft,
+            a.tokenId,
+            a.highestBidAmount
+        );
 
         require(feeAmount + royaltyAmount <= a.highestBidAmount, "invalid fee");
 
@@ -383,12 +405,14 @@ contract AuctionMarket is
     // Royalty 获取版税信息
     // =====================================================
 
-    function _getRoyaltyInfo(address nft, uint256 tokenId, uint256 salePrice)
-        internal
-        view
-        returns (address receiver, uint256 royaltyAmount)
-    {
-        try IERC165(nft).supportsInterface(type(IERC2981).interfaceId) returns (bool supported) {
+    function _getRoyaltyInfo(
+        address nft,
+        uint256 tokenId,
+        uint256 salePrice
+    ) internal view returns (address receiver, uint256 royaltyAmount) {
+        try IERC165(nft).supportsInterface(type(IERC2981).interfaceId) returns (
+            bool supported
+        ) {
             if (supported) {
                 return IERC2981(nft).royaltyInfo(tokenId, salePrice);
             }
@@ -407,7 +431,7 @@ contract AuctionMarket is
         }
 
         if (token == address(0)) {
-            (bool success,) = payable(to).call{value: amount}("");
+            (bool success, ) = payable(to).call{value: amount}("");
 
             require(success, "eth transfer failed");
         } else {
@@ -416,26 +440,12 @@ contract AuctionMarket is
     }
 
     // =====================================================
-    // Withdraw 取款
-    // =====================================================
-
-    function withdraw(address token) external nonReentrant {
-        uint256 amount = pendingWithdrawals[msg.sender][token];
-
-        require(amount > 0, "no balance");
-
-        pendingWithdrawals[msg.sender][token] = 0;
-
-        _pay(token, msg.sender, amount);
-
-        emit Withdrawal(msg.sender, token, amount);
-    }
-
-    // =====================================================
     // Views
     // =====================================================
 
-    function getAuction(uint256 auctionId) external view returns (Auction memory) {
+    function getAuction(
+        uint256 auctionId
+    ) external view returns (Auction memory) {
         return auctions[auctionId];
     }
 
@@ -445,26 +455,26 @@ contract AuctionMarket is
         return a.status == AuctionStatus.Active && block.timestamp < a.endTime;
     }
 
-    function getHighestBid(uint256 auctionId)
+    function getHighestBid(
+        uint256 auctionId
+    )
         external
         view
-        returns (address bidder, address bidToken, uint256 amount, uint256 usdValue)
+        returns (
+            address bidder,
+            address bidToken,
+            uint256 amount,
+            uint256 usdValue
+        )
     {
         Auction storage a = auctions[auctionId];
 
-        return (a.highestBidder, a.highestBidToken, a.highestBidAmount, a.highestBidUsd);
-    }
-
-    function getSellerAuctions(address seller) external view returns (uint256[] memory) {
-        return sellerAuctions[seller];
-    }
-
-    function getBidderAuctions(address bidder) external view returns (uint256[] memory) {
-        return bidderAuctions[bidder];
-    }
-
-    function getPendingWithdrawal(address user, address token) external view returns (uint256) {
-        return pendingWithdrawals[user][token];
+        return (
+            a.highestBidder,
+            a.highestBidToken,
+            a.highestBidAmount,
+            a.highestBidUsd
+        );
     }
 
     // =====================================================
@@ -499,7 +509,9 @@ contract AuctionMarket is
     // UUPS
     // =====================================================
 
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 
     receive() external payable {}
 

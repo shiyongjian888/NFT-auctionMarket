@@ -41,6 +41,15 @@ contract MyNFTTest is Test {
         assertEq(nft.ownerOf(1), user1);
     }
 
+    function testInitializeRevertsForZeroMaxSupply() public {
+        MyNFT impl = new MyNFT();
+
+        vm.expectRevert("Invalid supply");
+        new ERC1967Proxy(
+            address(impl), abi.encodeCall(MyNFT.initialize, ("MyNFT", "MNFT", 0, royaltyReceiver, 500))
+        );
+    }
+
     // =========================
     // Max Supply
     // =========================

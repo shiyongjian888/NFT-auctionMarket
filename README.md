@@ -160,142 +160,132 @@ forge script script/UpgradeAuctionMarket.s.sol:UpgradeAuctionMarket --rpc-url $S
 ## 测试结果
 
 ```
-Ran 5 tests for test/AuctionMarket.t.sol:AuctionMarketTest
-[PASS] testBidERC20() (gas: 462904)
-[PASS] testBidETH() (gas: 406797)
-[PASS] testCreateAuction() (gas: 249712)
-[PASS] testNFTTransferredToMarket() (gas: 245084)
-[PASS] testOutBid() (gas: 514111)
-Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 13.72ms (968.18µs CPU time)
+Ran 51 tests for test/AuctionMarket.t.sol:AuctionMarketTest
+[PASS] testAdminCanSetFeeRecipient() (gas: 27121)
+[PASS] testAdminCanSetOracle() (gas: 1203395)
+[PASS] testAdminCanSetPlatformFee() (gas: 25041)
+[PASS] testBidERC20RevertsForUnsupportedToken() (gas: 246806)
+[PASS] testBidERC20RevertsWhenAllowanceIsMissing() (gas: 233976)
+[PASS] testBidERC20RevertsWhenBidIsNotHigherInUsd() (gas: 342128)
+[PASS] testBidERC20StoresHighestBid() (gas: 351331)
+[PASS] testBidETHStoresHighestBid() (gas: 296823)
+[PASS] testBidRevertsWhenAlreadyHighestBidder() (gas: 304129)
+[PASS] testBidRevertsWhenAuctionCancelled() (gas: 198640)
+[PASS] testBidRevertsWhenAuctionEndedByTime() (gas: 209790)
+[PASS] testBidRevertsWhenAuctionMissing() (gas: 31779)
+[PASS] testBidRevertsWhenAuctionStatusEnded() (gas: 199191)
+[PASS] testBidRevertsWhenBidIsNotHigherInUsd() (gas: 309489)
+[PASS] testBidRevertsWhenPaused() (gas: 235860)
+[PASS] testCancelAuctionReturnsNft() (gas: 195062)
+[PASS] testCancelAuctionRevertsAfterBid() (gas: 297550)
+[PASS] testCancelAuctionRevertsForUnknownAuction() (gas: 20744)
+[PASS] testCancelAuctionRevertsWhenAlreadyCancelled() (gas: 192062)
+[PASS] testCancelAuctionRevertsWhenCallerIsNotSeller() (gas: 204800)
+[PASS] testCancelAuctionRevertsWhenEnded() (gas: 192460)
+[PASS] testCreateAuctionRevertsForDurationOverflow() (gas: 61400)
+[PASS] testCreateAuctionRevertsForZeroDuration() (gas: 62015)
+[PASS] testCreateAuctionRevertsWhenCallerIsNotOwner() (gas: 37780)
+[PASS] testCreateAuctionRevertsWhenPaused() (gas: 83813)
+[PASS] testCreateAuctionTransfersNftAndStoresAuction() (gas: 210289)
+[PASS] testEndAuctionNoBidsReturnsNftToSeller() (gas: 198201)
+[PASS] testEndAuctionRevertsBeforeEndTime() (gas: 203144)
+[PASS] testEndAuctionRevertsForUnknownAuction() (gas: 21646)
+[PASS] testEndAuctionRevertsWhenAlreadyEnded() (gas: 192401)
+[PASS] testEndAuctionRevertsWhenCancelled() (gas: 190995)
+[PASS] testEndAuctionRevertsWhenEthPaymentFails() (gas: 379428)
+[PASS] testEndAuctionRevertsWhenFeePlusRoyaltyExceedsBidAmount() (gas: 338786)
+[PASS] testEndAuctionWithERC20SettlesFeeRoyaltySellerAndTransfersNft() (gas: 436443)
+[PASS] testEndAuctionWithETHSettlesFeeRoyaltySellerAndTransfersNft() (gas: 421757)
+[PASS] testEndAuctionWithNoRoyaltyNftPaysOnlyFeeAndSeller() (gas: 373179)
+[PASS] testHigherERC20BidRefundsPreviousERC20Bid() (gas: 378455)
+[PASS] testHigherERC20BidRefundsPreviousETHBid() (gas: 381861)
+[PASS] testHigherETHBidRefundsPreviousERC20Bid() (gas: 341712)
+[PASS] testHigherETHBidRefundsPreviousETHBid() (gas: 321602)
+[PASS] testInitializeStoresConfig() (gas: 30819)
+[PASS] testOnlyOwnerCanPauseAndUnpause() (gas: 54535)
+[PASS] testOnlyOwnerCanSetFeeRecipient() (gas: 21013)
+[PASS] testOnlyOwnerCanSetOracle() (gas: 21605)
+[PASS] testOnlyOwnerCanSetPlatformFee() (gas: 18858)
+[PASS] testOnlyOwnerCanUpgradeToAuctionMarketV2() (gas: 1718833)
+[PASS] testOwnerCanPauseAndUnpause() (gas: 33607)
+[PASS] testReceiveETH() (gas: 22611)
+[PASS] testSetFeeRecipientRevertsForZeroAddress() (gas: 19713)
+[PASS] testSetPlatformFeeRevertsAboveTenPercent() (gas: 19564)
+[PASS] testUpgradeToAuctionMarketV2InitializesVersionAndKeepsState() (gas: 2055830)
+Suite result: ok. 51 passed; 0 failed; 0 skipped; finished in 3.37ms (10.49ms CPU time)
 
-Ran 29 tests for test/PriceOracle.t.sol:PriceOracleTest
+Ran 32 tests for test/PriceOracle.t.sol:PriceOracleTest
 [PASS] testETHPrice() (gas: 19786)
 [PASS] testGetFeedDecimals() (gas: 15687)
 [PASS] testGetLatestPriceAfterRemove() (gas: 34358)
-[PASS] testGetLatestPriceETH() (gas: 18427)
-[PASS] testGetLatestPriceUSDC() (gas: 20643)
+[PASS] testGetLatestPriceETH() (gas: 18449)
+[PASS] testGetLatestPriceRevertsForInvalidPrice() (gas: 22154)
+[PASS] testGetLatestPriceRevertsForStalePrice() (gas: 112228)
+[PASS] testGetLatestPriceUSDC() (gas: 20665)
 [PASS] testGetSupportedTokens() (gas: 20754)
 [PASS] testGetTokenAmountFromUsdAfterRemoveToken() (gas: 34629)
-[PASS] testGetTokenAmountFromUsdETH() (gas: 20237)
-[PASS] testGetTokenAmountFromUsdETHHalf() (gas: 20606)
-[PASS] testGetTokenAmountFromUsdUSDC() (gas: 22435)
+[PASS] testGetTokenAmountFromUsdETH() (gas: 20259)
+[PASS] testGetTokenAmountFromUsdETHHalf() (gas: 20672)
+[PASS] testGetTokenAmountFromUsdUSDC() (gas: 22457)
 [PASS] testGetTokenAmountFromUsdUnsupportedToken() (gas: 18165)
 [PASS] testGetTokenConfigUSDC() (gas: 17993)
-[PASS] testGetTokenDecimals() (gas: 15657)
-[PASS] testGetUsdValueAfterRemoveToken() (gas: 35264)
-[PASS] testGetUsdValueUnsupportedToken() (gas: 18382)
+[PASS] testGetTokenDecimals() (gas: 15679)
+[PASS] testGetUsdValueAfterRemoveToken() (gas: 35286)
+[PASS] testGetUsdValueUnsupportedToken() (gas: 18404)
 [PASS] testPauseAndUnpause() (gas: 146402)
 [PASS] testPauseBlocksRemoveToken() (gas: 45802)
-[PASS] testPauseBlocksSetTokenFeed() (gas: 148171)
-[PASS] testPauseDoesNotAffectPriceQuery() (gas: 50619)
-[PASS] testRemoveTokenConfig() (gas: 35352)
-[PASS] testRemoveTokenDisablesToken() (gas: 43654)
+[PASS] testPauseBlocksSetTokenFeed() (gas: 148193)
+[PASS] testPauseDoesNotAffectPriceQuery() (gas: 50685)
+[PASS] testRemoveTokenConfig() (gas: 35374)
+[PASS] testRemoveTokenDisablesToken() (gas: 43676)
 [PASS] testRemoveTokenUpdatesArray() (gas: 36735)
-[PASS] testSupportedTokenCount() (gas: 13322)
+[PASS] testSetTokenFeedRevertsForZeroFeed() (gas: 23403)
+[PASS] testSupportedTokenCount() (gas: 13344)
 [PASS] testTokenPrice() (gas: 22024)
-[PASS] testUnpauseAllowsRemoveToken() (gas: 51560)
+[PASS] testUnpauseAllowsRemoveToken() (gas: 51577)
 [PASS] testUnpauseAllowsSetTokenFeed() (gas: 144007)
 [PASS] testUnsupportedToken() (gas: 17850)
-[PASS] testUpdateFeed() (gas: 141535)
-[PASS] testUpgrade() (gas: 1055133)
-Suite result: ok. 29 passed; 0 failed; 0 skipped; finished in 15.32ms (3.98ms CPU time)
-
-Ran 21 tests for test/AuctionMarketEdge.t.sol:AuctionMarketEdgeTest
-[PASS] testAuctionNotFound() (gas: 21315)
-[PASS] testBidERC20() (gas: 463186)
-[PASS] testBidETH() (gas: 406907)
-[PASS] testCancelAuction() (gas: 239010)
-[PASS] testCannotBidAfterEnded() (gas: 252346)
-[PASS] testCreateAuction() (gas: 250094)
-[PASS] testEndAuctionTooEarly() (gas: 249038)
-[PASS] testEndAuctionWithoutBid() (gas: 239580)
-[PASS] testLowerBidReverts() (gas: 422876)
-[PASS] testNFTTransferredToMarket() (gas: 245128)
-[PASS] testOutBid() (gas: 514111)
-[PASS] testPauseBid() (gas: 285189)
-[PASS] testPauseCreateAuction() (gas: 83274)
-[PASS] testRevertCancelAfterBid() (gas: 410658)
-[PASS] testRevertCancelAlreadyCancelled() (gas: 238385)
-[PASS] testRevertCancelByNonSeller() (gas: 251539)
-[PASS] testRevertCreateAuctionWithOverflowDuration() (gas: 61675)
-[PASS] testRevertCreateAuctionWithZeroDuration() (gas: 61162)
-[PASS] testRoyaltyPayment() (gas: 527527)
-[PASS] testUnsupportedToken() (gas: 790842)
-[PASS] testWithdrawETH() (gas: 505856)
-Suite result: ok. 21 passed; 0 failed; 0 skipped; finished in 15.76ms (4.09ms CPU time)
-
-Ran 31 tests for test/AuctionMarketSettlement.t.sol:AuctionMarketSettlementTest
-[PASS] testBidERC20() (gas: 463279)
-[PASS] testBidERC20AuctionNotFound() (gas: 68439)
-[PASS] testBidERC20InvalidBidCrossToken() (gas: 511259)
-[PASS] testBidETH() (gas: 406910)
-[PASS] testBidETHAuctionCancelled() (gas: 251707)
-[PASS] testBidETHAuctionEnded() (gas: 258889)
-[PASS] testBidETHAuctionNotFound() (gas: 32899)
-[PASS] testCancelAuctionAfterEnded() (gas: 531167)
-[PASS] testCancelAuctionNotFound() (gas: 21874)
-[PASS] testCreateAuction() (gas: 250256)
-[PASS] testEndAuctionAlreadyEnded() (gas: 534385)
-[PASS] testEndAuctionCancelled() (gas: 242819)
-[PASS] testEndAuctionERC20() (gas: 577645)
-[PASS] testEndAuctionETH() (gas: 536693)
-[PASS] testEndAuctionWithoutRoyalty() (gas: 1186926)
-[PASS] testFeeTooLarge() (gas: 19405)
-[PASS] testGetBidderAuctions() (gas: 407526)
-[PASS] testGetSellerAuctions() (gas: 246955)
-[PASS] testHighestUsdBidWins() (gas: 656903)
-[PASS] testIsAuctionActive() (gas: 247718)
-[PASS] testMultipleOutBids() (gas: 554601)
-[PASS] testNFTTransferredToMarket() (gas: 245128)
-[PASS] testOutBid() (gas: 514200)
-[PASS] testPauseAndUnpause() (gas: 261256)
-[PASS] testPreviousBidRefund() (gas: 514831)
-[PASS] testSetFeeRecipient() (gas: 24992)
-[PASS] testSetOracle() (gas: 1180713)
-[PASS] testSetPlatformFee() (gas: 24894)
-[PASS] testUnpause() (gas: 33592)
-[PASS] testUpgrade() (gas: 1871046)
-[PASS] testUpgradeUnauthorized() (gas: 1864979)
-Suite result: ok. 31 passed; 0 failed; 0 skipped; finished in 15.87ms (7.41ms CPU time)
+[PASS] testUpdateFeed() (gas: 141579)
+[PASS] testUpgrade() (gas: 1078497)
+Suite result: ok. 32 passed; 0 failed; 0 skipped; finished in 3.57ms (1.60ms CPU time)
 
 Ran 22 tests for test/MyNFT.t.sol:MyNFTTest
-[PASS] testBatchMint() (gas: 234160)
-[PASS] testBatchMintExceedSupply() (gas: 36819)
-[PASS] testBatchMintReachExactSupply() (gas: 235475)
-[PASS] testExists() (gas: 130486)
-[PASS] testMaxSupplyLimit() (gas: 189875)
-[PASS] testMintSuccess() (gas: 127676)
-[PASS] testNextTokenId() (gas: 128808)
-[PASS] testPauseAndUnpause() (gas: 136606)
-[PASS] testPauseMint() (gas: 46951)
-[PASS] testPauseTransfer() (gas: 153792)
-[PASS] testRemainingSupply() (gas: 127721)
-[PASS] testResetTokenRoyalty() (gas: 141220)
-[PASS] testRoyaltyInfo() (gas: 134299)
-[PASS] testSetBaseURI() (gas: 40486)
-[PASS] testSetDefaultRoyalty() (gas: 29685)
-[PASS] testSetMaxSupply() (gas: 28576)
-[PASS] testSetMaxSupplyTooSmall() (gas: 128088)
-[PASS] testSupportsInterface() (gas: 10575)
-[PASS] testTokenRoyalty() (gas: 154508)
-[PASS] testTokenURI() (gas: 132765)
-[PASS] testTransferNFT() (gas: 139585)
-[PASS] testUpgradeNFT() (gas: 2113089)
-Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 15.92ms (4.51ms CPU time)
+[PASS] testBatchMint() (gas: 233621)
+[PASS] testBatchMintExceedSupply() (gas: 36814)
+[PASS] testBatchMintReachExactSupply() (gas: 234936)
+[PASS] testExists() (gas: 130330)
+[PASS] testInitializeRevertsForZeroMaxSupply() (gas: 2046725)
+[PASS] testMaxSupplyLimit() (gas: 189514)
+[PASS] testMintSuccess() (gas: 127493)
+[PASS] testNextTokenId() (gas: 128625)
+[PASS] testPauseAndUnpause() (gas: 136423)
+[PASS] testPauseMint() (gas: 46946)
+[PASS] testRemainingSupply() (gas: 127538)
+[PASS] testResetTokenRoyalty() (gas: 141037)
+[PASS] testRoyaltyInfo() (gas: 134116)
+[PASS] testSetBaseURI() (gas: 40508)
+[PASS] testSetDefaultRoyalty() (gas: 29680)
+[PASS] testSetMaxSupply() (gas: 28571)
+[PASS] testSetMaxSupplyTooSmall() (gas: 127910)
+[PASS] testSupportsInterface() (gas: 10597)
+[PASS] testTokenRoyalty() (gas: 154325)
+[PASS] testTokenURI() (gas: 130102)
+[PASS] testTransferNFT() (gas: 139251)
+[PASS] testUpgradeNFT() (gas: 1990665)
+Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 3.63ms (2.08ms CPU time)
 
-Ran 5 test suites in 77.37ms (76.60ms CPU time): 108 tests passed, 0 failed, 0 skipped (108 total tests)
+Ran 3 test suites in 8.93ms (10.57ms CPU time): 105 tests passed, 0 failed, 0 skipped (105 total tests)
 ```
 
-| File                           | % Lines               | % Statements         | % Branches         | % Funcs             |
-| ------------------------------ | --------------------- | -------------------- | ------------------ | ------------------- |
-| src/market/AuctionMarket.sol   | 100.00% (153/153)     | 100.00% (145/145)    | 87.18% (34/39)     | 100.00% (25/25)     |
-| src/market/AuctionMarketV2.sol | 100.00% (2/2)         | 100.00% (1/1)        | 100.00% (0/0)      | 100.00% (1/1)       |
-| src/nft/MyNFT.sol              | 100.00% (60/60)       | 100.00% (53/53)      | 80.00% (4/5)       | 100.00% (18/18)     |
-| src/nft/MyNFTV2.sol            | 100.00% (2/2)         | 100.00% (1/1)        | 100.00% (0/0)      | 100.00% (1/1)       |
-| src/oracle/PriceOracle.sol     | 100.00% (69/69)       | 96.97% (64/66)       | 76.92% (10/13)     | 100.00% (15/15)     |
-| src/oracle/PriceOracleV2.sol   | 100.00% (2/2)         | 100.00% (1/1)        | 100.00% (0/0)      | 100.00% (1/1)       |
-| **Total**                      | **100.00% (288/288)** | **99.25% (265/267)** | **84.21% (48/57)** | **100.00% (61/61)** |
-
+| File | % Lines | % Statements | % Branches | % Funcs |
+|------|----------|--------------|------------|----------|
+| src/market/AuctionMarket.sol | 100.00% (140/140) | 100.00% (134/134) | 100.00% (37/37) | 100.00% (21/21) |
+| src/market/AuctionMarketV2.sol | 100.00% (3/3) | 100.00% (2/2) | 100.00% (0/0) | 100.00% (1/1) |
+| src/nft/MyNFT.sol | 100.00% (58/58) | 100.00% (51/51) | 100.00% (5/5) | 100.00% (17/17) |
+| src/nft/MyNFTV2.sol | 100.00% (2/2) | 100.00% (1/1) | 100.00% (0/0) | 100.00% (1/1) |
+| src/oracle/PriceOracle.sol | 100.00% (71/71) | 100.00% (67/67) | 100.00% (13/13) | 100.00% (16/16) |
+| src/oracle/PriceOracleV2.sol | 100.00% (2/2) | 100.00% (1/1) | 100.00% (0/0) | 100.00% (1/1) |
+| **Total** | **100.00% (276/276)** | **100.00% (256/256)** | **100.00% (55/55)** | **100.00% (57/57)** |
 
 ## 下一步骤
 
@@ -314,16 +304,17 @@ forge script script/DeployAll.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast --ver
 
 #### 部署地址
 ```
-=== SEPOLIA DEPLOY RESULT ===
-  Oracle Impl: 0xb4102B9552b6985af2EE523Fbf29968960E67d7D
-  NFT Impl: 0x9d9c5daB48305CAd84FeF64a70E4FEa0d6D7296c
-  Market Impl: 0x08ed0CB167632a2Ee74E8CaC24A24EdF6225aC99
-  Oracle Proxy: 0x55EE6F4E427664E730449C736000636643b431aF
-  NFT Proxy: 0xfF3AE03B00B5Dda50C9FA824d1c8F3712f0132f1
-  Market Proxy: 0x7b47bfEec09B5238C22244726dEEC6eC2C2d6Ce2
+  === SEPOLIA DEPLOY RESULT ===
+  Oracle Impl: 0x8Cb3ED293610F4556481fd41CAcfcE33a5Fa7828
+  NFT Impl: 0x7A6D478f8Da50ed730C14a053c3FA74d1C0eA7ba
+  Market Impl: 0x5e30B9eDAfc216e975D8491300a362C71650ae75
+  Oracle Proxy: 0xE7be41F7fF9eC146D73e8dd0cBc32B70CB5C4a57
+  NFT Proxy: 0x3dCa4B01b3A16601acDDbE7E43d47B4491C9e771
+  Market Proxy: 0x8db1a2F66d55ae73d25f9c7E7dD59b96e0fC6561
   ETH/USD Feed: 0x694AA1769357215DE4FAC081bf1f309aDC325306
   USDC/USD Feed: 0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E
   Owner: 0x4028d9881eD0dE78672c21f8930E46b1A5B00d23
+  
 ```
 
 ## 合约功能总结

@@ -53,7 +53,7 @@ contract DeployAll is Script {
         MyNFT nft = MyNFT(
             address(
                 new ERC1967Proxy(
-                    address(nftImpl), abi.encodeCall(MyNFT.initialize, ("MyNFT", "MNFT", 1000, msg.sender, 500))
+                    address(nftImpl), abi.encodeCall(MyNFT.initialize, ("MyNFT", "MNFT", 1000, owner, 500))
                 )
             )
         );
